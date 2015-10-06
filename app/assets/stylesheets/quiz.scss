@@ -1,0 +1,16 @@
+#quiz {
+  width: 600px;
+  margin: 0 auto;
+}
+.choice {
+  display: block;
+
+}
+.choice:hover {
+  color: white;
+  background-color: black;
+}
+.choice.selected {
+  color: white;
+  background-color: gray;
+}

@@ -1,0 +1,16 @@
+{
+  "name": "flavor-quiz",
+  "dependencies" : {
+    "babelify": "6.3.0",
+    "browserify": "~> 10.2.4",
+    "browserify-incremental": "^3.0.1",
+    "react": "0.13.3",
+    "react-redux": "~> 3.0",
+    "react-router": "1.0.0-rc1",
+    "redux": "~> 3.0"
+  },
+  "license": "MIT",
+  "engines": {
+    "node": ">= 4.0"
+  }
+}
