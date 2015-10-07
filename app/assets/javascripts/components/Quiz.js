@@ -28,39 +28,46 @@ var Store = {
     choices: ["Bring on the snow","Sun Sun Sun","Flowers Blooming","Thunder Storms", "Changing Leaves", "Dry Heat"],
   }],
   flavors: ['Green Apple', 'Mango', 'Banana', 'Strawberry', 'Grape', 'Cherry'],
-  currentQuestion: 0,
+  currentQuestionIndex: 0,
   selections: {},
 
   getCurrentQuestion: function() {
-    return this.questions[this.currentQuestion];
+    return this.questions[this.currentQuestionIndex];
   },
   goPrevQuestion: function() {
-    if(this.currentQuestion - 1 >= 0) {
-      this.currentQuestion -= 1;
+    if(this.currentQuestionIndex - 1 >= 0) {
+      this.currentQuestionIndex -= 1;
     }
     this.onChange();
   },
   goNextQuestion: function() {
-    if(this.currentQuestion + 1 < this.questions.length) {
-      this.currentQuestion += 1;
+    if(this.currentQuestionIndex + 1 < this.questions.length) {
+      this.currentQuestionIndex += 1;
     }
     this.onChange();
   },
-  selectChoice: function(questionNum, choiceNum) {
-    this.selections[questionNum] = choiceNum;
+  selectChoice: function(questionIndex, choiceIndex) {
+    this.selections[questionIndex] = choiceIndex;
     this.onChange();
   },
-  getSelection: function(questionNum) {
-    return this.selections[questionNum];
+  getSelection: function(questionIndex) {
+    return this.selections[questionIndex];
   },
   getTopFlavor: function() {
-    let selectionCounts = Object.keys(this.selections)
-      .map(function(key) { return this.selections[key] }) // get all the choices
+    let selections = this.selections;
+    let selectionCounts = Object.keys(selections)
+      .map(function(key) { return selections[key] }) // get all the choices
       .reduce(function(p, n) { p[n] = (p[n] + 1) || 1; return p; }, {}); // object with count for all the choices;
     let top = Object.keys(selectionCounts) // get index of most common selection
       .reduce(function(p, n) { return selectionCounts[p] > selectionCounts[n] ? p : n })
 
     return this.flavors[top];
+  },
+  getQuestionCount: function() {
+    return questions.length;
+  },
+  getCurrentSelection: function() {
+    return this.getSelection(this.currentQuestionIndex);
   },
   getState: function() {
     return {
@@ -70,7 +77,6 @@ var Store = {
     }
   },
   onChange: function() {
-    // Stub, this is set by a component
   }
 }
 
@@ -92,14 +98,11 @@ var Choice = React.createClass({
 
 
 var Quiz = React.createClass({
-  getInitialState: function() {
-    return Store.getState();
-  },
   componentDidMount: function() {
     Store.onChange = this.onChange; // forceUpdate
   },
   onChange: function() {
-    this.setState(Store.getState());
+    this.forceUpdate();
   },
   prev: function() {
     Store.goPrevQuestion();
@@ -108,10 +111,10 @@ var Quiz = React.createClass({
     Store.goNextQuestion();
   },
   render: function() {
-    var question = this.state.question.question;
-    var qIndex = this.state.questionIndex;
-    var selection = this.state.selection;
-    var choices = this.state.question.choices.map(function(value, index) {
+    var question = Store.getCurrentQuestion();
+    var qIndex = Store.currentQuestionIndex;
+    var selection = Store.getCurrentSelection();;
+    var choices = question.choices.map(function(value, index) {
       return(
         <Choice key={qIndex + '-' + index} qIndex={qIndex} value={value} index={index} selected={selection === index} />
       );
@@ -119,7 +122,7 @@ var Quiz = React.createClass({
 
     return(
       <div id="quiz">
-        <h2>{ question }</h2>
+        <h2>{ question.question }</h2>
         { choices }
         <button onClick={this.prev}>Previous</button>
         <button onClick={this.next}>Next</button>
