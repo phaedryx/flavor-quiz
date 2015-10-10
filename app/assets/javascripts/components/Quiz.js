@@ -31,6 +31,11 @@ var Store = {
   currentQuestionIndex: 0,
   selections: {},
 
+  reset: function() {
+    this.currentQuestionIndex = 0;
+    this.selections = {};
+    this.onChange();
+  },
   getCurrentQuestion: function() {
     return this.questions[this.currentQuestionIndex];
   },
@@ -41,9 +46,7 @@ var Store = {
     this.onChange();
   },
   goNextQuestion: function() {
-    if(this.currentQuestionIndex + 1 < this.questions.length) {
-      this.currentQuestionIndex += 1;
-    }
+    this.currentQuestionIndex += 1;
     this.onChange();
   },
   selectChoice: function(questionIndex, choiceIndex) {
@@ -64,19 +67,13 @@ var Store = {
     return this.flavors[top];
   },
   getQuestionCount: function() {
-    return questions.length;
+    return this.questions.length;
   },
   getCurrentSelection: function() {
     return this.getSelection(this.currentQuestionIndex);
   },
-  getState: function() {
-    return {
-      selection: this.getSelection(this.currentQuestion),
-      question: this.getCurrentQuestion(),
-      questionIndex: this.currentQuestion
-    }
-  },
   onChange: function() {
+    // stub to be set later
   }
 }
 
@@ -96,14 +93,7 @@ var Choice = React.createClass({
   }
 });
 
-
-var Quiz = React.createClass({
-  componentDidMount: function() {
-    Store.onChange = this.onChange; // forceUpdate
-  },
-  onChange: function() {
-    this.forceUpdate();
-  },
+var Question = React.createClass({
   prev: function() {
     Store.goPrevQuestion();
   },
@@ -119,9 +109,8 @@ var Quiz = React.createClass({
         <Choice key={qIndex + '-' + index} qIndex={qIndex} value={value} index={index} selected={selection === index} />
       );
     });
-
     return(
-      <div id="quiz">
+      <div id="question">
         <h2>{ question.question }</h2>
         { choices }
         <button onClick={this.prev}>Previous</button>
@@ -131,6 +120,41 @@ var Quiz = React.createClass({
   }
 });
 
-window.Store = Store;
-window.Quiz = Quiz;
+var Result = React.createClass({
+  reset: function() {
+    Store.reset();
+  },
+  render: function() {
+    return(
+      <div id="result">
+        You are a { Store.getTopFlavor() }!
+        <br />
+        <button onClick={ this.reset }>Start Over</button>
+      </div>
+    );
+  }
+});
+
+var Quiz = React.createClass({
+  componentDidMount: function() {
+    Store.onChange = this.onChange; // forceUpdate
+  },
+  onChange: function() {
+    this.forceUpdate();
+  },
+  render: function() {
+    return(
+      <div id="quiz">
+        {(() => {
+          if(Store.currentQuestionIndex >= Store.getQuestionCount()) {
+            return <Result />
+          } else {
+            return <Question />
+          }
+        })()}
+      </div>
+    );
+  }
+});
+
 module.exports = Quiz;

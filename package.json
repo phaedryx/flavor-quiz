@@ -4,9 +4,9 @@
     "babelify": "6.3.0",
     "browserify": "~> 10.2.4",
     "browserify-incremental": "^3.0.1",
-    "react": "0.13.3",
+    "react": "0.14",
+    "react-dom": "0.14",
     "react-redux": "~> 3.0",
-    "react-router": "1.0.0-rc1",
     "redux": "~> 3.0"
   },
   "license": "MIT",
